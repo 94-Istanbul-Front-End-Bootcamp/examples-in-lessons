@@ -1,38 +1,50 @@
-/*Numerik not değerine göre harf notunu hesaplayan ve geçme kalma
-durumunu harf notunun rengine göre belirten uygulama
-*/
+let data = [];
 
-const calculate = () => {
-    let not = parseInt(document.querySelector("#score").value)
-    let sonuc = document.querySelector("#sonuc");
-    let harfNotu = "";
-    sonuc.innerHTML = "";
-    sonuc.setAttribute("class", "success");
+const fetchData = () => {
+    //verinin çekildiği yer
+    fetch("data.json")
+    .then(response => {
+        return response.json();
+    })
+    .then(responseData => {
+        //json'dan okunan verinin data array'ine atanması
+        data = responseData;
 
-    if (!validate(not))
-        return;
+        //veri geldikten sonra filtreleme butonu görünür olsun
+        let filterButton = document.querySelector("#filterButton");
+        filterButton.setAttribute("style", "");
 
-    if (not > 85 && not <= 100) {
-        harfNotu = "AA";
-    } else if (not >= 70) {
-        harfNotu = "BB";
-    } else if (not >= 60) {
-        harfNotu = "CC";
-    } else if (not >= 45) {
-        harfNotu = "DD";
-    } else {
-        harfNotu = "FF";
-        sonuc.setAttribute("class", "failed");
-    }
-
-    sonuc.innerHTML = harfNotu;
+        //verinin html içerisinde listelendiği fonksiyon
+        listData(responseData);
+    })
+    .catch(err => {
+        //hata yönetimi
+        console.log(err)
+    })
 }
 
-const validate = (not) => {
-    if (not < 0 || not > 100) {
-        alert("Yanlış değer girdiniz.");
-        return false;
-    } else {
-        return true;
+//verinin ul tag'i içerisinde listelenmesini sağlayan fonksiyon
+const listData = (data) => {
+    let list = document.querySelector(".list");
+    list.innerHTML = data.map(element => {
+        return `
+        <li id=${element.id}>
+            <span class='bold'>name:</span> ${element.name}
+            <span class='bold'>email:</span> ${element.email}
+        </li>
+        `;
+    })
+}
+
+//verinin filtrelenmesini sağlayan fonksiyon
+//TODO
+const filterData = (filter) => {
+    switch (filter) {
+        case "isActive":
+            let filteredData = data.filter(element => element.isActive === true);
+            listData(filteredData);
+            break;
+        default:
+            break;
     }
 }
